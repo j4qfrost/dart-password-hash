@@ -5,9 +5,9 @@ import 'package:test/test.dart';
 import 'package:crypto/crypto.dart';
 
 List<int> encodeBytes(String bytes) {
-  var byteList = bytes.split(" ");
-  var result = <int>[];
-  for (var byte in byteList) {
+  final byteList = bytes.split(" ");
+  final result = <int>[];
+  for (final byte in byteList) {
     result.add(int.parse(byte, radix: 16));
   }
   return result;
@@ -16,7 +16,7 @@ List<int> encodeBytes(String bytes) {
 void main() {
   group("Salt", () {
     test("Can generate random list of integers", () {
-      var salt = Salt.generate(64);
+      final salt = Salt.generate(64);
       expect(salt.length, 64);
 
       expect(salt, everyElement(lessThan(256)));
@@ -24,10 +24,10 @@ void main() {
     });
 
     test("Can generate base64 salt", () {
-      var salt = Salt.generateAsBase64String(64);
+      final salt = Salt.generateAsBase64String(64);
       expect(salt is String, true);
 
-      var decoded = new Base64Decoder().convert(salt);
+      final decoded = const Base64Decoder().convert(salt);
       expect(decoded.length, 64);
 
       expect(decoded, everyElement(lessThan(256)));
@@ -37,9 +37,9 @@ void main() {
 
   group("RFC6070", () {
     test("Disallow large values of derived key length", () {
-      var sha = sha1;
-      var hLen = sha.blockSize;
-      var gen = new PBKDF2(hashAlgorithm: sha);
+      final sha = sha1;
+      final hLen = sha.blockSize;
+      final gen = PBKDF2(hashAlgorithm: sha);
 
       try {
         gen.generateKey("password", "salt", 1, ((2 << 31) - 1) * hLen + 1);
@@ -50,8 +50,8 @@ void main() {
     });
 
     test("Test vectors 1", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("password", "salt", 1, 20);
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("password", "salt", 1, 20);
       expect(
           output,
           encodeBytes(
@@ -59,8 +59,8 @@ void main() {
     });
 
     test("Test vectors 2", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("password", "salt", 2, 20);
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("password", "salt", 2, 20);
       expect(
           output,
           encodeBytes(
@@ -68,8 +68,8 @@ void main() {
     });
 
     test("Test vectors 3", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("password", "salt", 4096, 20);
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("password", "salt", 4096, 20);
       expect(
           output,
           encodeBytes(
@@ -78,8 +78,8 @@ void main() {
 
     // This test may take a few minutes to run
     test("Test vectors 4", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("password", "salt", 16777216, 20);
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("password", "salt", 16777216, 20);
       expect(
           output,
           encodeBytes(
@@ -87,8 +87,8 @@ void main() {
     });
 
     test("Test vectors 5", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("passwordPASSWORDpassword",
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("passwordPASSWORDpassword",
           "saltSALTsaltSALTsaltSALTsaltSALTsalt", 4096, 25);
       expect(
           output,
@@ -97,8 +97,8 @@ void main() {
     });
 
     test("Test vectors 6", () {
-      var gen = new PBKDF2(hashAlgorithm: sha1);
-      var output = gen.generateKey("pass\u0000word", "sa\u0000lt", 4096, 16);
+      final gen = PBKDF2(hashAlgorithm: sha1);
+      final output = gen.generateKey("pass\u0000word", "sa\u0000lt", 4096, 16);
       expect(output,
           encodeBytes("56 fa 6a a7 55 48 09 9d cc 37 d7 f0 34 25 e0 c3"));
     });
@@ -106,9 +106,9 @@ void main() {
 
   group("Sha256", () {
     test("Disallow large values of derived key length", () {
-      var sha = sha256;
-      var hLen = sha.blockSize;
-      var gen = new PBKDF2(hashAlgorithm: sha);
+      final sha = sha256;
+      final hLen = sha.blockSize;
+      final gen = PBKDF2(hashAlgorithm: sha);
 
       try {
         gen.generateKey("password", "salt", 1, ((2 << 31) - 1) * hLen + 1);
@@ -119,8 +119,8 @@ void main() {
     });
 
     test("Test vectors 1", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("password", "salt", 1, 32);
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("password", "salt", 1, 32);
       expect(
           output,
           encodeBytes(
@@ -128,8 +128,8 @@ void main() {
     });
 
     test("Test vectors 2", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("password", "salt", 2, 32);
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("password", "salt", 2, 32);
       expect(
           output,
           encodeBytes(
@@ -137,8 +137,8 @@ void main() {
     });
 
     test("Test vectors 3", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("password", "salt", 4096, 32);
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("password", "salt", 4096, 32);
       expect(
           output,
           encodeBytes(
@@ -147,8 +147,8 @@ void main() {
 
     // This test may take a few minutes to run
     test("Test vectors 4", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("password", "salt", 16777216, 32);
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("password", "salt", 16777216, 32);
       expect(
           output,
           encodeBytes(
@@ -156,8 +156,8 @@ void main() {
     });
 
     test("Test vectors 5", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("passwordPASSWORDpassword",
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("passwordPASSWORDpassword",
           "saltSALTsaltSALTsaltSALTsaltSALTsalt", 4096, 40);
       expect(
           output,
@@ -166,8 +166,8 @@ void main() {
     });
 
     test("Test vectors 6", () {
-      var gen = new PBKDF2(hashAlgorithm: sha256);
-      var output = gen.generateKey("pass\u0000word", "sa\u0000lt", 4096, 16);
+      final gen = PBKDF2(hashAlgorithm: sha256);
+      final output = gen.generateKey("pass\u0000word", "sa\u0000lt", 4096, 16);
       expect(output,
           encodeBytes("89 b6 9d 05 16 f8 29 89 3c 69 62 26 65 0a 86 87"));
     });

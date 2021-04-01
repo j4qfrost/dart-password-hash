@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:math';
+import 'dart:typed_data';
 
 /// Generates salts for hashing algorithms.
 class Salt {
@@ -8,8 +8,8 @@ class Salt {
   ///
   /// Each element of this list is a byte.
   static List<int> generate(int length) {
-    var buffer = new Uint8List(length);
-    var rng = new Random.secure();
+    final buffer = Uint8List(length);
+    final rng = Random.secure();
     for (var i = 0; i < length; i++) {
       buffer[i] = rng.nextInt(256);
     }
@@ -22,7 +22,7 @@ class Salt {
   /// [length] is the number of bytes generated, not the [length] of the base64 encoded string returned. Decoding
   /// the base64 encoded string will yield [length] number of bytes.
   static String generateAsBase64String(int length) {
-    var encoder = new Base64Encoder();
+    const encoder = Base64Encoder();
     return encoder.convert(generate(length));
   }
 }

@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-
 import 'package:password_hash/salt.dart';
 
 /// Instances of this type derive a key from a password, salt, and hash function.
@@ -13,7 +12,7 @@ class PBKDF2 {
   /// Creates instance capable of generating a key.
   ///
   /// [hashAlgorithm] defaults to [sha256].
-  PBKDF2({Hash hashAlgorithm}) {
+  PBKDF2({Hash? hashAlgorithm}) {
     this.hashAlgorithm = hashAlgorithm ?? sha256;
   }
 
@@ -23,8 +22,8 @@ class PBKDF2 {
     _blockSize = _hashAlgorithm.convert([1, 2, 3]).bytes.length;
   }
 
-  Hash _hashAlgorithm;
-  int _blockSize;
+  late Hash _hashAlgorithm;
+  late int _blockSize;
 
   /// Hashes a [password] with a given [salt].
   ///
@@ -36,17 +35,17 @@ class PBKDF2 {
   List<int> generateKey(
       String password, String salt, int rounds, int keyLength) {
     if (keyLength > (pow(2, 32) - 1) * _blockSize) {
-      throw new PBKDF2Exception("Derived key too long");
+      throw PBKDF2Exception("Derived key too long");
     }
 
-    var numberOfBlocks = (keyLength / _blockSize).ceil();
-    var hmac = new Hmac(hashAlgorithm, utf8.encode(password));
-    var key = new ByteData(keyLength);
+    final numberOfBlocks = (keyLength / _blockSize).ceil();
+    final hmac = Hmac(hashAlgorithm, utf8.encode(password));
+    final key = ByteData(keyLength);
     var offset = 0;
 
-    var saltBytes = utf8.encode(salt);
-    var saltLength = saltBytes.length;
-    var inputBuffer = new ByteData(saltBytes.length + 4)
+    final saltBytes = utf8.encode(salt);
+    final saltLength = saltBytes.length;
+    final inputBuffer = ByteData(saltBytes.length + 4)
       ..buffer.asUint8List().setRange(0, saltBytes.length, saltBytes);
 
     for (var blockNumber = 1; blockNumber <= numberOfBlocks; blockNumber++) {
@@ -55,7 +54,7 @@ class PBKDF2 {
       inputBuffer.setUint8(saltLength + 2, blockNumber >> 8);
       inputBuffer.setUint8(saltLength + 3, blockNumber);
 
-      var block = _XORDigestSink.generate(inputBuffer, hmac, rounds);
+      final block = _XORDigestSink.generate(inputBuffer, hmac, rounds);
       var blockLength = _blockSize;
       if (offset + blockLength > keyLength) {
         blockLength = keyLength - offset;
@@ -73,7 +72,7 @@ class PBKDF2 {
   /// This method invokes [generateKey] and base64 encodes the result.
   String generateBase64Key(
       String password, String salt, int rounds, int keyLength) {
-    var converter = new Base64Encoder();
+    const converter = Base64Encoder();
 
     return converter.convert(generateKey(password, salt, rounds, keyLength));
   }
@@ -91,17 +90,17 @@ class PBKDF2Exception implements Exception {
 class _XORDigestSink extends Sink<Digest> {
   _XORDigestSink(ByteData inputBuffer, Hmac hmac) {
     lastDigest = hmac.convert(inputBuffer.buffer.asUint8List()).bytes;
-    bytes = new ByteData(lastDigest.length)
+    bytes = ByteData(lastDigest.length)
       ..buffer.asUint8List().setRange(0, lastDigest.length, lastDigest);
   }
 
   static Uint8List generate(ByteData inputBuffer, Hmac hmac, int rounds) {
-    var hashSink = new _XORDigestSink(inputBuffer, hmac);
+    final hashSink = _XORDigestSink(inputBuffer, hmac);
 
     // If rounds == 1, we have already run the first hash in the constructor
     // so this loop won't run.
     for (var round = 1; round < rounds; round++) {
-      var hmacSink = hmac.startChunkedConversion(hashSink);
+      final hmacSink = hmac.startChunkedConversion(hashSink);
       hmacSink.add(hashSink.lastDigest);
       hmacSink.close();
     }
@@ -109,8 +108,8 @@ class _XORDigestSink extends Sink<Digest> {
     return hashSink.bytes.buffer.asUint8List();
   }
 
-  ByteData bytes;
-  Uint8List lastDigest;
+  late ByteData bytes;
+  late List<int> lastDigest;
 
   @override
   void add(Digest digest) {
