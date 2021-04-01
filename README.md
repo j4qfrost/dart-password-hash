@@ -1,4 +1,4 @@
-# password_hash
+# conduit_password_hash
 
 [![Build Status](https://travis-ci.org/stablekernel/dart-password-hash.svg?branch=master)](https://travis-ci.org/stablekernel/dart-password-hash)
 
